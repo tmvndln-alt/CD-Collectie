@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cds">
+<meta name="theme-color" content="#1B2A1E">
+<title>Cd-collectie</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --ink: #1B2A1E;
+  --paper: #EFE7D2;
+  --cream: #F8F3E6;
+  --brass: #B8873B;
+  --brass-dark: #8F6B2C;
+  --rust: #9C3B2E;
+  --forest-mid: #3A5745;
+  --text-dark: #241F17;
+  --line: #D9CDAE;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--paper); color: var(--text-dark); font-family: 'Work Sans', sans-serif; min-height: 100vh; padding-bottom: 60px; }
+.serif { font-family: 'Fraunces', serif; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+header { background: var(--paper); border-bottom: 1px solid var(--line); padding: 20px 16px 0; position: sticky; top: 0; z-index: 90; }
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass-dark); margin: 0 0 4px; }
+h1 { font-size: 28px; font-weight: 600; color: var(--ink); margin: 0; }
+.teller { font-size: 11px; color: var(--forest-mid); font-family: 'IBM Plex Mono', monospace; margin-top: 3px; display: block; }
+
+.btn-row { display: flex; gap: 8px; position: relative; }
+button { font-family: 'Work Sans', sans-serif; border: none; cursor: pointer; }
+.btn-icon { background: transparent; border: 1px solid var(--line); color: var(--ink); width: 38px; height: 38px; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.btn-primary { background: var(--ink); color: var(--cream); border-radius: 3px; padding: 10px 16px; font-size: 13px; font-weight: 500; }
+.btn-primary:hover { background: var(--forest-mid); }
+.btn-brass { background: var(--brass); color: var(--ink); border-radius: 3px; padding: 10px 16px; font-size: 13px; font-weight: 500; }
+.btn-brass:hover { background: var(--brass-dark); color: var(--cream); }
+.btn-outline { background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 3px; padding: 9px 14px; font-size: 13px; }
+
+.dropdown-wrap { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: var(--cream); border: 1px solid var(--line); border-radius: 3px; min-width: 190px; box-shadow: 0 10px 24px -8px rgba(27,42,30,0.35); z-index: 60; overflow: hidden; }
+.dropdown-menu.open { display: block; }
+.dropdown-menu button { display: block; width: 100%; text-align: left; padding: 11px 14px; background: none; border: none; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink); }
+.dropdown-menu button:last-child { border-bottom: none; }
+.dropdown-menu button:hover { background: var(--paper); }
+.dropdown-menu button:disabled { opacity: 0.4; }
+
+.controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0 10px; }
+.search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
+.search-wrap input { width: 100%; padding: 9px 12px 9px 32px; border: 1px solid var(--line); background: var(--cream); border-radius: 3px; font-size: 13px; font-family: 'Work Sans', sans-serif; color: var(--text-dark); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--brass-dark); }
+select.ctrl { border: 1px solid var(--line); background: var(--cream); border-radius: 3px; padding: 9px 10px; font-size: 13px; color: var(--text-dark); font-family: 'Work Sans', sans-serif; max-width: 220px; }
+
+.tabs { display: flex; margin-top: 6px; }
+.tab { flex: 1; padding: 10px 4px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--brass-dark); border-bottom: 2px solid transparent; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em; }
+.tab.on { color: var(--ink); border-bottom-color: var(--rust); }
+
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.error-box { display: none; align-items: flex-start; gap: 8px; font-size: 13px; background: rgba(156,59,46,0.1); color: var(--rust); padding: 10px 12px; border-radius: 3px; margin-bottom: 14px; }
+.error-box.show { display: flex; }
+
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+.stat { background: var(--cream); border: 1px solid var(--line); border-radius: 3px; padding: 12px; text-align: center; }
+.stat .n { font-size: 20px; font-weight: 700; color: var(--ink); font-family: 'Fraunces', serif; }
+.stat .l { font-size: 9.5px; color: var(--brass-dark); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+.empty-state { text-align: center; padding: 70px 20px; }
+.empty-state .title { font-size: 19px; color: var(--forest-mid); margin-bottom: 6px; }
+.empty-state .hint { font-size: 12px; color: var(--brass-dark); font-family: 'IBM Plex Mono', monospace; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+.card { background: var(--cream); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; display: flex; flex-direction: column; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px -12px rgba(27,42,30,0.35); }
+.photo-wrap { position: relative; }
+.photo-wrap img, .photo-placeholder { width: 100%; height: 170px; object-fit: cover; display: block; clip-path: polygon(0% 0%,100% 0%,100% 93%,95% 97%,90% 93%,85% 97%,80% 93%,75% 97%,70% 93%,65% 97%,60% 93%,55% 97%,50% 93%,45% 97%,40% 93%,35% 97%,30% 93%,25% 97%,20% 93%,15% 97%,10% 93%,5% 97%,0% 93%); }
+.photo-placeholder { background: var(--line); display: flex; align-items: center; justify-content: center; color: var(--brass-dark); font-size: 20px; }
+.stamp { position: absolute; top: 8px; left: 8px; border: 1.5px solid var(--rust); color: var(--rust); background: rgba(255,255,255,0.88); font-size: 10px; padding: 3px 8px; border-radius: 2px; }
+.photo-count-badge { position: absolute; bottom: 8px; right: 8px; font-size: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 7px; border-radius: 10px; font-family: 'IBM Plex Mono', monospace; }
+.card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.card-body h3 { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+.card-body .artiest { font-size: 12px; color: var(--brass-dark); font-weight: 600; }
+.tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--forest-mid); margin-top: 2px; }
+.card-actions { margin-top: 8px; display: flex; gap: 6px; }
+.card-actions button { flex: 1; font-size: 11.5px; padding: 6px 0; border-radius: 3px; }
+.card-actions .danger { color: var(--rust); border-color: var(--line); }
+
+.overlay { display: none; position: fixed; inset: 0; background: rgba(27,42,30,0.55); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--cream); width: 100%; max-width: 560px; border-radius: 3px; margin: 20px 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.modal-head h2 { font-size: 19px; font-weight: 600; color: var(--ink); }
+.modal-head button { background: none; padding: 4px; font-size: 18px; color: var(--ink); }
+.modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.modal-foot { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--brass-dark); font-family: 'IBM Plex Mono', monospace; }
+.field input, .field select, .field textarea { background: var(--cream); border: 1px solid var(--line); border-radius: 3px; padding: 8px 10px; font-size: 14px; font-family: 'Work Sans', sans-serif; color: var(--text-dark); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--brass); outline-offset: 1px; }
+
+.photo-drop { width: 100%; height: 150px; border: 2px dashed var(--line); border-radius: 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--brass-dark); font-size: 13px; cursor: pointer; background: none; }
+.photo-thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.photo-thumb { position: relative; height: 84px; border-radius: 3px; overflow: hidden; border: 1px solid var(--line); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-thumb .cover-tag { position: absolute; bottom: 3px; left: 3px; font-size: 9px; background: rgba(255,255,255,0.9); color: var(--forest-mid); padding: 1px 5px; border-radius: 2px; }
+.photo-thumb .remove-btn { position: absolute; top: 3px; right: 3px; width: 19px; height: 19px; border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff; font-size: 12px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.photo-thumb-move { position: absolute; bottom: 3px; right: 3px; display: flex; gap: 3px; }
+.photo-thumb-move button { width: 19px; height: 19px; border-radius: 3px; background: rgba(0,0,0,0.55); color: #fff; font-size: 9px; padding: 0; border: none; display: flex; align-items: center; justify-content: center; }
+.photo-thumb-add { height: 84px; border: 2px dashed var(--line); border-radius: 3px; display: flex; align-items: center; justify-content: center; color: var(--brass-dark); font-size: 20px; background: none; }
+
+.ai-btn { width: 100%; padding: 11px; background: var(--brass); color: var(--ink); border-radius: 3px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.ai-btn:disabled { opacity: 0.5; }
+.ai-hint { font-size: 11px; color: var(--brass-dark); text-align: center; margin-top: -4px; }
+.spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.2); border-top-color: currentColor; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.detail-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.detail-photo-grid img { width: 100%; height: 130px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.detail-grid .full { grid-column: 1 / -1; }
+.detail-field-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--brass-dark); font-family: 'IBM Plex Mono', monospace; margin-bottom: 2px; }
+.detail-field-value { font-size: 14px; color: var(--text-dark); white-space: pre-wrap; }
+.detail-stamp { display: inline-block; border: 1.5px solid var(--rust); color: var(--rust); font-size: 11px; padding: 2px 8px; border-radius: 2px; font-family: 'IBM Plex Mono', monospace; }
+
+.settings-text { font-size: 13px; line-height: 1.55; color: var(--text-dark); }
+.settings-text a { color: var(--brass-dark); }
+.settings-modal .modal { max-width: 460px; }
+.settings-modal pre { background: var(--paper); border: 1px solid var(--line); border-radius: 3px; padding: 8px 10px; font-size: 10.5px; overflow-x: auto; white-space: pre-wrap; color: var(--brass-dark); margin: 6px 0; }
+.status-ok { color: var(--forest-mid); font-size: 12px; }
+.status-warn { color: var(--rust); font-size: 12px; }
+.link-btn { background: none; border: none; color: var(--rust); font-size: 12px; text-decoration: underline; padding: 0; }
+
+.batch-modal .modal { max-width: 640px; }
+.batch-drop { width: 100%; height: 130px; border: 2px dashed var(--line); border-radius: 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--brass-dark); font-size: 13px; cursor: pointer; background: none; }
+.batch-list { display: flex; flex-direction: column; gap: 10px; }
+.batch-card { display: flex; gap: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 3px; padding: 8px; }
+.batch-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+.batch-card-fields { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.batch-card-row { display: flex; gap: 6px; }
+.batch-card input { background: var(--cream); border: 1px solid var(--line); border-radius: 3px; padding: 5px 7px; font-size: 12px; flex: 1; min-width: 0; font-family: 'Work Sans', sans-serif; color: var(--text-dark); }
+.batch-card-remove { background: none; border: none; color: var(--rust); font-size: 15px; padding: 0 4px; align-self: flex-start; }
+.batch-card-err { font-size: 10.5px; color: var(--rust); }
+.batch-card.analyzing { opacity: 0.6; }
+.batch-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div>
+      <p class="eyebrow mono">Persoonlijke inventaris</p>
+      <h1 class="serif">Cd-collectie</h1>
+      <span class="teller mono" id="syncBadge"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn-icon" id="settingsBtn" title="AI- en syncinstellingen">&#9881;</button>
+      <div class="dropdown-wrap">
+        <button class="btn-brass" id="exportMenuBtn">&#8681; Exporteren &#9662;</button>
+        <div class="dropdown-menu" id="exportMenu">
+          <button type="button" id="exportPdfBtn">Naar PDF</button>
+          <button type="button" id="exportXlsBtn">Naar Excel</button>
+        </div>
+      </div>
+      <div class="dropdown-wrap">
+        <button class="btn-primary" id="addMenuBtn">+ Toevoegen &#9662;</button>
+        <div class="dropdown-menu" id="addMenu">
+          <button type="button" id="addTabBtn">Nieuwe cd</button>
+          <button type="button" id="batchAddBtn">Batch toevoegen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="zoekInput" placeholder="Zoek artiest of titel..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <select class="ctrl" id="artistSelect"></select>
+    <select class="ctrl" id="genreSelect"></select>
+    <select class="ctrl" id="sortSelect">
+      <option value="nieuwste">Nieuwste eerst</option>
+      <option value="artiest">Artiest (A-Z)</option>
+      <option value="titel">Titel (A-Z)</option>
+      <option value="jaar">Jaar (nieuw-oud)</option>
+    </select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tabCollectie" onclick="toonTab('collectie',this)">Collectie</button>
+    <button class="tab" id="tabToevoegen" onclick="toonTab('toevoegen',this)">+ Nieuwe cd</button>
+  </div>
+</header>
+
+<main>
+  <div id="globalError" class="error-box"></div>
+
+  <div id="collectie">
+    <div class="stats" id="statsBar"></div>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <p class="title serif" id="emptyTitle">De cd-kast is nog leeg.</p>
+      <p class="hint" id="emptyHint">Voeg je eerste cd toe met een foto.</p>
+    </div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <div id="toevoegen" style="display:none;padding-top:8px;max-width:560px;">
+    <div id="errArea" class="error-box"></div>
+    <div id="fotoArea"></div>
+    <input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
+    <div id="aiArea"></div>
+    <div class="field-grid">
+      <div class="field full"><label>Artiest *</label><input id="fa" placeholder="Pink Floyd"></div>
+      <div class="field full"><label>Titel *</label><input id="ft" placeholder="The Wall"></div>
+      <div class="field"><label>Jaar</label><input id="fj" type="number" placeholder="1979"></div>
+      <div class="field"><label>Label / nr.</label><input id="fl"></div>
+      <div class="field"><label>Formaat</label>
+        <select id="ff">
+          <option>CD</option><option>2xCD</option><option>Single CD</option><option>Maxi-Single</option><option>EP</option><option>Box Set</option><option>Digipak</option><option>Overig</option>
+        </select>
+      </div>
+      <div class="field"><label>Genre</label><input id="fg"></div>
+      <div class="field"><label>Land</label><input id="fla"></div>
+      <div class="field"><label>Barcode</label><input id="fbc"></div>
+      <div class="field">
+        <label>Staat cd</label>
+        <select id="fsv">
+          <option>Mint (M)</option><option>Near Mint (NM)</option><option selected>Very Good Plus (VG+)</option><option>Very Good (VG)</option><option>Good Plus (G+)</option><option>Good (G)</option><option>Fair (F)</option><option>Poor (P)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Staat hoesje</label>
+        <select id="fsh">
+          <option>Mint (M)</option><option>Near Mint (NM)</option><option selected>Very Good Plus (VG+)</option><option>Very Good (VG)</option><option>Good Plus (G+)</option><option>Good (G)</option><option>Fair (F)</option><option>Poor (P)</option>
+        </select>
+      </div>
+      <div class="field"><label>Waarde vanaf (&euro;)</label><input id="fwmin" type="number"></div>
+      <div class="field"><label>Waarde tot (&euro;)</label><input id="fwmax" type="number"></div>
+      <div class="field full"><label>Locatie in huis</label><input id="floc"></div>
+      <div class="field full"><label>Afbeelding-URL (optioneel, bv. Discogs)</label><input id="fafb" placeholder="https://i.discogs.com/..."></div>
+      <div class="field full"><label>Opmerkingen</label><textarea id="fo" rows="2"></textarea></div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:12px;padding:12px;font-size:14px;" onclick="cdOpslaan()">Toevoegen</button>
+  </div>
+</main>
+
+<div class="overlay" id="detailOverlay">
+  <div class="modal">
+    <div class="modal-head"><h2 class="serif" id="detailTitle">Cd</h2><button id="closeDetail">&#10005;</button></div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-foot">
+      <button class="btn-outline" id="detailCloseBtn">Sluiten</button>
+      <button class="btn-outline danger" id="detailDeleteBtn" style="color:var(--rust);">Verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay batch-modal" id="batchOverlay">
+  <div class="modal">
+    <div class="modal-head"><h2 class="serif">Batch toevoegen</h2><button id="closeBatch">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="error-box" id="batchErrorBox"></div>
+      <p class="settings-text" style="margin-bottom:10px;">Elke geselecteerde foto wordt een <strong>aparte cd</strong>. Handig als je in één keer een hele stapel hoezen fotografeert. Vul per cd minimaal artiest en titel in, of laat de AI dat voor je doen.</p>
+      <div id="batchDropArea"></div>
+      <input type="file" id="batchFileInput" accept="image/*" multiple style="display:none">
+      <div class="batch-toolbar" id="batchToolbar" style="display:none;">
+        <button class="btn-brass" id="batchAnalyzeAllBtn" style="border-radius:3px;padding:8px 14px;font-size:13px;">&#10024; Analyseer alles met AI</button>
+        <button class="btn-outline" id="batchAddMoreBtn">+ Meer foto's</button>
+      </div>
+      <div class="batch-list" id="batchList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" id="cancelBatchBtn">Annuleren</button>
+      <button class="btn-primary" id="saveBatchBtn">Bewaar alles</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay settings-modal" id="settingsOverlay">
+  <div class="modal">
+    <div class="modal-head"><h2 class="serif">AI &amp; synchronisatie</h2><button id="closeSettings">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="field full">
+        <label>Gemini API-key</label>
+        <input id="apiKeyInput" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" placeholder="AIzaSy&hellip;">
+      </div>
+      <p class="settings-text" id="geminiStatus"></p>
+      <button type="button" id="clearGeminiBtn" class="link-btn" style="margin-bottom:8px;">Key verwijderen</button>
+      <p class="settings-text" style="color:var(--brass-dark);">Wordt alleen lokaal in je browser bewaard, rechtstreeks naar Google gestuurd.</p>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+
+      <h2 class="serif" style="font-size:16px;margin-bottom:6px;">Synchroniseren tussen apparaten</h2>
+      <p class="settings-text">Gebruik je al het Vondstenboek, de Bibliotheek of de platenapp? Plak gerust <strong>dezelfde Firebase-configuratie</strong> — deze app gebruikt een eigen tabel (cds), dus niets loopt door elkaar.</p>
+      <div class="field full">
+        <label>Firebase-configuratie</label>
+        <textarea id="firebaseConfigInput" rows="6" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" placeholder='{"apiKey":"...", ...}'></textarea>
+      </div>
+      <button type="button" id="clearFirebaseBtn" class="link-btn" style="margin-bottom:8px;">Synchronisatie stopzetten</button>
+      <button class="btn-outline" id="importLocalBtn" type="button" style="width:100%;margin-bottom:8px;">Importeer lokale cds naar synchronisatie</button>
+      <p class="settings-text" id="syncStatus"></p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" id="cancelSettings">Annuleren</button>
+      <button class="btn-primary" id="saveSettings">Bewaar instellingen</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+'use strict';
+
+// ---------- State ----------
+var SKEY = 'cd_v10';
+var GEMINI_KEY_STORAGE = 'cd_gemini_key';
+var FIREBASE_CONFIG_STORAGE = 'cd_firebase_config';
+var col = [], zoek = '', artistFilter = '', genreFilter = '', openId = null;
+var syncMode = false, firestoreDb = null, unsubscribeSnapshot = null, persistenceAttempted = false;
+var currentPhotos = [], editingId = null, analyzing = false;
+var aiConversation = null, aiPendingQuestion = '', aiFollowUpRounds = 0, aiQuotaExceeded = false;
+var MAX_PHOTOS = 5, PHOTO_MAX_CHARS = 180000, MAX_BATCH = 20, MAX_AI_FOLLOWUPS = 2;
+var batchItems = [];
+
+var ST = {
+  'Mint (M)': { k: '#2ecc71' }, 'Near Mint (NM)': { k: '#27ae60' }, 'Very Good Plus (VG+)': { k: '#3498db' },
+  'Very Good (VG)': { k: '#e67e22' }, 'Good Plus (G+)': { k: '#e74c3c' }, 'Good (G)': { k: '#c0392b' },
+  'Fair (F)': { k: '#922b21' }, 'Poor (P)': { k: '#641e16' }
+};
+
+function hashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; } return Math.abs(h).toString(36); }
+function ensureIds() {
+  col.forEach(function (p, idx) {
+    if (!p.id) p.id = 'legacy_' + idx + '_' + hashStr((p.artiest || '') + '|' + (p.titel || '') + '|' + (p.jaar || '') + '|' + (p.label || ''));
+    if (!p.volgnummer) p.volgnummer = idx + 1;
+  });
+}
+function getPhotos(p) {
+  if (Array.isArray(p.fotos) && p.fotos.length) return p.fotos;
+  if (p.foto) return [p.foto];
+  if (p.afbeelding) return [p.afbeelding];
+  return [];
+}
+function formatInventoryNumber(n) { return 'CD-' + String(n).padStart(4, '0'); }
+function escapeHtml(str) { var div = document.createElement('div'); div.textContent = str || ''; return div.innerHTML; }
+
+function laad() {
+  try { var d = localStorage.getItem(SKEY); col = d ? JSON.parse(d) : []; } catch (e) { col = []; }
+  ensureIds();
+  sla();
+}
+function sla() { try { localStorage.setItem(SKEY, JSON.stringify(col)); } catch (e) { } }
+
+function persistNew(item) {
+  if (syncMode) return firestoreDb.collection('cds').doc(item.id).set(item);
+  col.push(item); sla(); return Promise.resolve();
+}
+function persistDelete(id) {
+  if (syncMode) return firestoreDb.collection('cds').doc(id).delete();
+  col = col.filter(function (p) { return p.id !== id; }); sla(); return Promise.resolve();
+}
+
+// ---------- Render ----------
+function toonTab(id, btn) {
+  document.getElementById('collectie').style.display = id === 'collectie' ? '' : 'none';
+  document.getElementById('toevoegen').style.display = id === 'toevoegen' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  else document.getElementById(id === 'collectie' ? 'tabCollectie' : 'tabToevoegen').classList.add('on');
+}
+
+function renderFilters() {
+  var artistCounts = {}, genreCounts = {};
+  col.forEach(function (p) {
+    if (p.artiest) artistCounts[p.artiest] = (artistCounts[p.artiest] || 0) + 1;
+    var g = (p.genre || '').trim();
+    if (g) genreCounts[g] = (genreCounts[g] || 0) + 1;
+  });
+  var artists = Object.keys(artistCounts).sort(function (a, b) { return a.localeCompare(b); });
+  var aSel = document.getElementById('artistSelect');
+  aSel.innerHTML = '<option value="">Alle artiesten (' + col.length + ')</option>' +
+    artists.map(function (a) { return '<option value="' + encodeURIComponent(a) + '"' + (artistFilter === a ? ' selected' : '') + '>' + escapeHtml(a) + ' (' + artistCounts[a] + ')</option>'; }).join('');
+  aSel.value = artistFilter ? encodeURIComponent(artistFilter) : '';
+
+  var genres = Object.keys(genreCounts).sort(function (a, b) { return a.localeCompare(b); });
+  var gSel = document.getElementById('genreSelect');
+  if (!genres.length) { gSel.style.display = 'none'; genreFilter = ''; }
+  else {
+    gSel.style.display = '';
+    gSel.innerHTML = '<option value="">Alle genres</option>' +
+      genres.map(function (g) { return '<option value="' + escapeHtml(g) + '"' + (genreFilter === g ? ' selected' : '') + '>' + escapeHtml(g) + ' (' + genreCounts[g] + ')</option>'; }).join('');
+    gSel.value = genreFilter;
+  }
+}
+
+function sortCol(list) {
+  var mode = document.getElementById('sortSelect').value;
+  var copy = list.slice();
+  if (mode === 'artiest') copy.sort(function (a, b) { return (a.artiest || '').localeCompare(b.artiest || ''); });
+  else if (mode === 'titel') copy.sort(function (a, b) { return (a.titel || '').localeCompare(b.titel || ''); });
+  else if (mode === 'jaar') copy.sort(function (a, b) { return (b.jaar || 0) - (a.jaar || 0); });
+  else copy.sort(function (a, b) { return (b.volgnummer || 0) - (a.volgnummer || 0); });
+  return copy;
+}
+
+function render() {
+  renderFilters();
+  document.getElementById('exportPdfBtn').disabled = col.length === 0;
+  document.getElementById('exportXlsBtn').disabled = col.length === 0;
+
+  var artiesten = {}; col.forEach(function (p) { if (p.artiest) artiesten[p.artiest] = 1; });
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat"><div class="n">' + col.length + '</div><div class="l">Cds</div></div>' +
+    '<div class="stat"><div class="n">' + Object.keys(artiesten).length + '</div><div class="l">Artiesten</div></div>' +
+    '<div class="stat"><div class="n">' + col.filter(function (p) { return getPhotos(p).length; }).length + '</div><div class="l">Met foto</div></div>';
+
+  var q = zoek.trim().toLowerCase();
+  var filtered = col.filter(function (p) {
+    if (artistFilter && p.artiest !== artistFilter) return false;
+    if (genreFilter && (p.genre || '').trim() !== genreFilter) return false;
+    if (!q) return true;
+    return [p.artiest, p.titel, p.label, p.genre].filter(Boolean).some(function (v) { return v.toLowerCase().indexOf(q) !== -1; });
+  });
+  filtered = sortCol(filtered);
+
+  var grid = document.getElementById('grid');
+  var emptyState = document.getElementById('emptyState');
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    emptyState.style.display = 'block';
+    document.getElementById('emptyTitle').textContent = col.length === 0 ? 'De cd-kast is nog leeg.' : 'Niets gevonden.';
+    document.getElementById('emptyHint').textContent = col.length === 0 ? 'Voeg je eerste cd toe met een foto.' : 'Probeer een andere zoekterm of filter.';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  grid.innerHTML = filtered.map(function (p) {
+    var photos = getPhotos(p);
+    var photoHtml = photos.length ? '<img src="' + photos[0] + '" alt="' + escapeHtml(p.titel) + '">' : '<div class="photo-placeholder">&#127925;</div>';
+    var countBadge = photos.length > 1 ? '<span class="photo-count-badge">&#128247; ' + photos.length + '</span>' : '';
+    var stamp = p.inventarisnummer ? '<span class="stamp mono">' + p.inventarisnummer + '</span>' : '';
+    var genreTag = p.genre ? '<span class="tag">' + escapeHtml(p.genre) + '</span>' : '';
+    return '<div class="card" data-view="' + p.id + '">' +
+      '<div class="photo-wrap">' + photoHtml + stamp + countBadge + '</div>' +
+      '<div class="card-body">' +
+      '<div class="artiest">' + escapeHtml(p.artiest) + '</div>' +
+      '<h3 class="serif">' + escapeHtml(p.titel) + '</h3>' +
+      genreTag +
+      '<div class="card-actions">' +
+      '<button class="btn-outline" data-edit="' + p.id + '">Bewerken</button>' +
+      '<button class="btn-outline danger" data-delete="' + p.id + '">Verwijder</button>' +
+      '</div></div></div>';
+  }).join('');
+
+  grid.querySelectorAll('[data-view]').forEach(function (card) {
+    card.onclick = function (e) {
+      if (e.target.closest('[data-edit]') || e.target.closest('[data-delete]')) return;
+      var item = col.find(function (p) { return p.id === card.dataset.view; });
+      if (item) openDetail(item);
+    };
+  });
+  grid.querySelectorAll('[data-edit]').forEach(function (btn) {
+    btn.onclick = function () { var item = col.find(function (p) { return p.id === btn.dataset.edit; }); if (item) openEditForm(item); };
+  });
+  grid.querySelectorAll('[data-delete]').forEach(function (btn) {
+    btn.onclick = function () { verwijderCd(btn.dataset.delete); };
+  });
+}
+
+document.getElementById('zoekInput').addEventListener('input', function () { zoek = this.value; render(); });
+document.getElementById('artistSelect').addEventListener('change', function () { artistFilter = this.value ? decodeURIComponent(this.value) : ''; render(); });
+document.getElementById('genreSelect').addEventListener('change', function () { genreFilter = this.value; render(); });
+document.getElementById('sortSelect').addEventListener('change', render);
+
+// ---------- Detail & bewerken ----------
+function detailField(label, value) {
+  if (value === null || value === undefined || value === '') return '';
+  return '<div><p class="detail-field-label">' + escapeHtml(label) + '</p><p class="detail-field-value">' + escapeHtml(String(value)) + '</p></div>';
+}
+function openDetail(item) {
+  document.getElementById('detailTitle').textContent = item.titel || 'Cd';
+  var photos = getPhotos(item);
+  var photoHtml = photos.length ? '<div class="detail-photo-grid">' + photos.map(function (src, i) { return '<img src="' + src + '" alt="Foto ' + (i + 1) + '">'; }).join('') + '</div>' : '<p class="detail-field-value">Geen foto</p>';
+  var waardeText = (item.waardeMin || item.waardeMax) ? ('\u20ac ' + (item.waardeMin ?? '?') + (item.waardeMax ? ' \u2013 \u20ac ' + item.waardeMax : '')) : '';
+  document.getElementById('detailBody').innerHTML =
+    '<span class="detail-stamp">' + (item.inventarisnummer || '') + '</span>' + photoHtml +
+    '<div class="detail-grid">' +
+    detailField('Artiest', item.artiest) + detailField('Jaar', item.jaar) +
+    detailField('Label / nr.', item.label) + detailField('Formaat', item.formaat) +
+    detailField('Genre', item.genre) + detailField('Land', item.land) +
+    detailField('Barcode', item.barcode) + detailField('Geschatte waarde', waardeText) +
+    detailField('Staat cd', item.staat_cd) + detailField('Staat hoesje', item.staat_hoesje) +
+    detailField('Locatie in huis', item.locatie) +
+    '<div class="full">' + detailField('Opmerkingen', item.opmerkingen) + '</div>' +
+    '</div>';
+  document.getElementById('detailDeleteBtn').onclick = function () { closeDetail(); verwijderCd(item.id); };
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+document.getElementById('closeDetail').onclick = closeDetail;
+document.getElementById('detailCloseBtn').onclick = closeDetail;
+document.getElementById('detailOverlay').addEventListener('click', function (e) { if (e.target.id === 'detailOverlay') closeDetail(); });
+
+function openEditForm(item) {
+  editingId = item.id;
+  currentPhotos = getPhotos(item).slice();
+  document.getElementById('fa').value = item.artiest || '';
+  document.getElementById('ft').value = item.titel || '';
+  document.getElementById('fj').value = item.jaar || '';
+  document.getElementById('fl').value = item.label || '';
+  document.getElementById('ff').value = item.formaat || 'LP';
+  document.getElementById('fg').value = item.genre || '';
+  document.getElementById('fla').value = item.land || '';
+  document.getElementById('fbc').value = item.barcode || '';
+  document.getElementById('fsv').value = item.staat_cd || 'Very Good Plus (VG+)';
+  document.getElementById('fsh').value = item.staat_hoesje || 'Very Good Plus (VG+)';
+  document.getElementById('fwmin').value = item.waardeMin ?? '';
+  document.getElementById('fwmax').value = item.waardeMax ?? '';
+  document.getElementById('floc').value = item.locatie || '';
+  document.getElementById('fafb').value = item.afbeelding || '';
+  document.getElementById('fo').value = item.opmerkingen || '';
+  renderFotoArea();
+  toonTab('toevoegen');
+}
+function verwijderCd(id) {
+  if (!confirm('Deze cd definitief verwijderen?')) return;
+  persistDelete(id).then(function () { if (!syncMode) render(); }).catch(function () { showGlobalError('Verwijderen is niet gelukt.'); });
+}
+
+// ---------- Foto's & AI ----------
+var fotoArea = document.getElementById('fotoArea');
+var aiArea = document.getElementById('aiArea');
+var fotoInput = document.getElementById('fotoInput');
+
+function renderFotoArea() {
+  var thumbs = currentPhotos.map(function (src, idx) {
+    return '<div class="photo-thumb"><img src="' + src + '" alt="Foto ' + (idx + 1) + '">' +
+      (idx === 0 ? '<span class="cover-tag">omslag</span>' : '') +
+      '<button class="remove-btn" type="button" data-remove-photo="' + idx + '">&#10005;</button>' +
+      '<div class="photo-thumb-move">' +
+      (idx > 0 ? '<button type="button" data-move-photo="' + idx + '" data-move-dir="-1">&#9664;</button>' : '<span style="width:19px;height:19px;display:inline-block;"></span>') +
+      (idx < currentPhotos.length - 1 ? '<button type="button" data-move-photo="' + idx + '" data-move-dir="1">&#9654;</button>' : '<span style="width:19px;height:19px;display:inline-block;"></span>') +
+      '</div></div>';
+  }).join('');
+  var addTile = currentPhotos.length < MAX_PHOTOS ? '<button class="photo-thumb-add" id="photoAddBtn" type="button">+</button>' : '';
+  fotoArea.innerHTML = currentPhotos.length
+    ? '<div class="photo-thumb-grid">' + thumbs + addTile + '</div>'
+    : '<button class="photo-drop" id="photoDropBtn" type="button">&#128247; Foto(\'s) van de hoes toevoegen</button>';
+  var addBtn = document.getElementById('photoAddBtn') || document.getElementById('photoDropBtn');
+  if (addBtn) addBtn.onclick = function () { fotoInput.click(); };
+  fotoArea.querySelectorAll('[data-remove-photo]').forEach(function (btn) {
+    btn.onclick = function () { currentPhotos.splice(Number(btn.dataset.removePhoto), 1); renderFotoArea(); };
+  });
+  fotoArea.querySelectorAll('[data-move-photo]').forEach(function (btn) {
+    btn.onclick = function () {
+      var idx = Number(btn.dataset.movePhoto), dir = Number(btn.dataset.moveDir), target = idx + dir;
+      if (target < 0 || target >= currentPhotos.length) return;
+      var tmp = currentPhotos[idx]; currentPhotos[idx] = currentPhotos[target]; currentPhotos[target] = tmp;
+      renderFotoArea();
+    };
+  });
+  renderAiArea();
+}
+
+async function resizeImage(file, maxWidth, quality) {
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        var canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = function () { reject(new Error('Kan afbeelding niet lezen')); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function () { reject(new Error('Kan bestand niet lezen')); };
+    reader.readAsDataURL(file);
+  });
+}
+async function resizeImageWithLimit(file, maxChars) {
+  maxChars = maxChars || PHOTO_MAX_CHARS;
+  var width = 1000, quality = 0.8, dataUrl = await resizeImage(file, width, quality), attempts = 0;
+  while (dataUrl.length > maxChars && attempts < 6) {
+    width = Math.round(width * 0.8); quality = Math.max(0.4, quality - 0.1);
+    dataUrl = await resizeImage(file, width, quality); attempts++;
+  }
+  return dataUrl;
+}
+fotoInput.addEventListener('change', async function (e) {
+  var files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  clearErr();
+  var room = MAX_PHOTOS - currentPhotos.length;
+  var toProcess = files.slice(0, room);
+  if (files.length > room) showErr("Je kunt maximaal " + MAX_PHOTOS + " foto's per cd toevoegen.");
+  try {
+    for (var i = 0; i < toProcess.length; i++) { currentPhotos.push(await resizeImageWithLimit(toProcess[i])); }
+    renderFotoArea();
+  } catch (err) { showErr('Een van de foto\'s kon niet worden geladen.'); }
+  e.target.value = '';
+});
+
+var IDENTIFY_PROMPT = "Je bent een expert in cd's en discografie. Bekijk de cd-hoes op de foto en geef ALLEEN een JSON-object terug, zonder andere tekst, markdown-opmaak of uitleg eromheen, in exact dit formaat: {\"artiest\": \"naam van de artiest of band\", \"titel\": \"titel van het album\", \"jaar\": geheel getal met het vermoedelijke jaar van deze uitgave of null, \"label\": \"platenlabel en eventueel catalogusnummer indien zichtbaar\", \"formaat\": \"kies uit: CD, 2xCD, Single CD, Maxi-Single, EP, Box Set, Digipak, Overig\", \"genre\": \"muziekgenre\", \"land\": \"land van uitgave indien herkenbaar aan de hoes, anders lege string\", \"waardeMin\": geheel getal in euro of null, \"waardeMax\": geheel getal in euro of null, \"opmerkingen\": \"1 korte zin met bijzonderheden over deze uitgave indien zichtbaar\", \"vraag\": \"een korte, concrete vervolgvraag aan de eigenaar als je de uitgave, editie of conditie niet zeker genoeg kunt aflezen van de foto, anders een lege string\"} Wees voorzichtig en realistisch met waardeschattingen; het zijn indicaties, geen taxaties. Stel alleen een vraag als dat de inschatting echt zou verbeteren.";
+
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+async function callGeminiConversation(apiKey, contents) {
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' + encodeURIComponent(apiKey);
+  var maxAttempts = 3, response;
+  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: contents }) });
+    } catch (networkErr) { throw new Error('Geen verbinding met Google kunnen maken.'); }
+    if (response.ok) break;
+    var detail = '';
+    try { var errBody = await response.json(); detail = (errBody && errBody.error && errBody.error.message) || ''; } catch (e) { }
+    var status = response.status;
+    var isQuota = status === 429 && /quota|free_tier_requests/i.test(detail);
+    if (isQuota) { var qe = new Error('Je hebt het gratis dagelijkse AI-quotum van Google bereikt. Probeer het morgen weer, of vul dit item voor nu handmatig in.'); qe.quotaExceeded = true; throw qe; }
+    if ((status === 503 || status === 429) && attempt < maxAttempts) { await sleep(attempt * 2000); continue; }
+    throw new Error('AI-analyse mislukt (' + status + ')' + (detail ? ': ' + detail : ''));
+  }
+  var data = await response.json();
+  var candidate = data && data.candidates && data.candidates[0];
+  if (!candidate) throw new Error('Geen antwoord van de AI ontvangen.');
+  var text = candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text;
+  if (!text) throw new Error('Geen tekstantwoord van de AI ontvangen.');
+  return text;
+}
+function parseAiJson(text) {
+  var clean = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(clean); } catch (e) { throw new Error('Kon het AI-antwoord niet lezen.'); }
+}
+async function analyzeWithGemini(dataUrl, apiKey) {
+  var match = dataUrl.match(/^data:(.+);base64,(.*)$/);
+  if (!match) throw new Error('Ongeldige afbeelding');
+  var contents = [{ role: 'user', parts: [{ text: IDENTIFY_PROMPT }, { inline_data: { mime_type: match[1], data: match[2] } }] }];
+  var text = await callGeminiConversation(apiKey, contents);
+  var suggestion = parseAiJson(text);
+  return { suggestion: suggestion, conversation: contents.concat([{ role: 'model', parts: [{ text: text }] }]) };
+}
+async function askGeminiFollowUp(apiKey, conversation, userAnswer) {
+  var newContents = conversation.concat([{ role: 'user', parts: [{ text: userAnswer + '\n\nGeef op basis hiervan opnieuw ALLEEN het JSON-object in exact hetzelfde format als eerder. Vul "vraag" alleen opnieuw in als er nog een noodzakelijke onduidelijkheid overblijft, anders laat je dat veld leeg.' }] }]);
+  var text = await callGeminiConversation(apiKey, newContents);
+  var suggestion = parseAiJson(text);
+  return { suggestion: suggestion, conversation: newContents.concat([{ role: 'model', parts: [{ text: text }] }]) };
+}
+
+function getApiKey() { return localStorage.getItem(GEMINI_KEY_STORAGE) || ''; }
+
+function renderAiArea() {
+  if (!currentPhotos.length) { aiArea.innerHTML = ''; return; }
+  var hasKey = !!getApiKey();
+  if (analyzing) { aiArea.innerHTML = '<button class="ai-btn" disabled><span class="spinner"></span> AI bekijkt de hoes&hellip;</button>'; return; }
+  if (aiQuotaExceeded) { aiArea.innerHTML = '<p class="ai-hint" style="color:var(--rust);">Dagelijkse AI-limiet bereikt \u2014 morgen weer beschikbaar. Vul deze cd voor nu handmatig aan.</p>'; return; }
+  if (aiPendingQuestion) {
+    aiArea.innerHTML =
+      '<div class="error-box show" style="background:rgba(184,135,59,0.12);color:var(--brass-dark);"><strong>AI vraagt:</strong> ' + escapeHtml(aiPendingQuestion) + '</div>' +
+      '<div style="display:flex;gap:6px;margin:8px 0;"><input type="text" id="aiAnswerInput" placeholder="Typ hier je antwoord..." style="flex:1;border-radius:3px;padding:8px 10px;border:1px solid var(--line);background:var(--cream);font-size:13px;">' +
+      '<button class="ai-btn" id="aiAnswerBtn" type="button" style="width:auto;">Versturen</button></div>' +
+      '<button type="button" id="aiSkipQuestionBtn" class="link-btn">Vraag overslaan</button>';
+    document.getElementById('aiAnswerBtn').onclick = handleAnswerFollowUp;
+    document.getElementById('aiAnswerInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); handleAnswerFollowUp(); } });
+    document.getElementById('aiSkipQuestionBtn').onclick = function () { aiPendingQuestion = ''; aiConversation = null; renderAiArea(); };
+    return;
+  }
+  aiArea.innerHTML = '<button class="ai-btn" id="analyzeBtn" type="button">&#10024; Laat AI dit herkennen</button>' + (hasKey ? (currentPhotos.length > 1 ? '<p class="ai-hint">De AI bekijkt alleen de omslagfoto.</p>' : '') : '<p class="ai-hint">Nog geen API-key ingesteld \u2014 klik op &#9881; rechtsboven.</p>');
+  document.getElementById('analyzeBtn').onclick = handleAnalyze;
+}
+function applyAiSuggestion(s) {
+  if (s.artiest) document.getElementById('fa').value = s.artiest;
+  if (s.titel) document.getElementById('ft').value = s.titel;
+  if (s.jaar) document.getElementById('fj').value = s.jaar;
+  if (s.label) document.getElementById('fl').value = s.label;
+  if (s.genre) document.getElementById('fg').value = s.genre;
+  if (s.land) document.getElementById('fla').value = s.land;
+  if (s.opmerkingen) document.getElementById('fo').value = s.opmerkingen;
+  if (s.waardeMin != null) document.getElementById('fwmin').value = s.waardeMin;
+  if (s.waardeMax != null) document.getElementById('fwmax').value = s.waardeMax;
+  if (s.formaat) {
+    var sel = document.getElementById('ff');
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === s.formaat) { sel.selectedIndex = i; break; }
+  }
+}
+async function handleAnalyze() {
+  var apiKey = getApiKey();
+  if (!apiKey) { showErr('Stel eerst een gratis Gemini API-key in via &#9881; rechtsboven.'); return; }
+  if (aiQuotaExceeded) { renderAiArea(); return; }
+  if (!currentPhotos.length) return;
+  clearErr(); analyzing = true; aiPendingQuestion = ''; aiFollowUpRounds = 0; renderAiArea();
+  try {
+    var result = await analyzeWithGemini(currentPhotos[0], apiKey);
+    applyAiSuggestion(result.suggestion);
+    if (result.suggestion.vraag) { aiPendingQuestion = result.suggestion.vraag; aiConversation = result.conversation; }
+  } catch (err) {
+    if (err && err.quotaExceeded) aiQuotaExceeded = true;
+    else showErr(err && err.message ? err.message : 'De AI kon deze foto niet analyseren.');
+  } finally { analyzing = false; renderAiArea(); }
+}
+async function handleAnswerFollowUp() {
+  var apiKey = getApiKey();
+  var input = document.getElementById('aiAnswerInput');
+  var answer = input ? input.value.trim() : '';
+  if (!answer || !aiConversation) return;
+  clearErr(); analyzing = true; renderAiArea();
+  try {
+    var result = await askGeminiFollowUp(apiKey, aiConversation, answer);
+    applyAiSuggestion(result.suggestion);
+    aiFollowUpRounds++;
+    if (result.suggestion.vraag && aiFollowUpRounds < MAX_AI_FOLLOWUPS) { aiPendingQuestion = result.suggestion.vraag; aiConversation = result.conversation; }
+    else { aiPendingQuestion = ''; aiConversation = null; }
+  } catch (err) {
+    aiPendingQuestion = ''; aiConversation = null;
+    if (err && err.quotaExceeded) aiQuotaExceeded = true;
+    else showErr(err && err.message ? err.message : 'Versturen is niet gelukt.');
+  } finally { analyzing = false; renderAiArea(); }
+}
+
+// ---------- Opslaan ----------
+function showErr(msg) { var el = document.getElementById('errArea'); el.innerHTML = msg; el.classList.add('show'); }
+function clearErr() { var el = document.getElementById('errArea'); el.innerHTML = ''; el.classList.remove('show'); }
+function showGlobalError(msg) { var el = document.getElementById('globalError'); el.textContent = msg; el.classList.add('show'); }
+function clearGlobalError() { var el = document.getElementById('globalError'); el.textContent = ''; el.classList.remove('show'); }
+
+async function cdOpslaan() {
+  clearErr();
+  var a = document.getElementById('fa').value.trim(), t = document.getElementById('ft').value.trim();
+  if (!a || !t) { showErr('Artiest en titel zijn verplicht'); return; }
+  var id = editingId || ('r' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+  var existing = editingId ? col.find(function (p) { return p.id === editingId; }) : null;
+  var volgnummer = existing ? existing.volgnummer : (Math.max(0, ...col.map(function (p) { return p.volgnummer || 0; })) + 1);
+  var item = {
+    id: id, volgnummer: volgnummer,
+    inventarisnummer: existing ? existing.inventarisnummer : formatInventoryNumber(volgnummer),
+    artiest: a, titel: t,
+    jaar: parseInt(document.getElementById('fj').value) || null,
+    label: document.getElementById('fl').value.trim(),
+    barcode: document.getElementById('fbc').value.trim(),
+    staat_cd: document.getElementById('fsv').value,
+    staat_hoesje: document.getElementById('fsh').value,
+    formaat: document.getElementById('ff').value,
+    genre: document.getElementById('fg').value.trim(),
+    land: document.getElementById('fla').value.trim(),
+    waardeMin: document.getElementById('fwmin').value === '' ? null : Number(document.getElementById('fwmin').value),
+    waardeMax: document.getElementById('fwmax').value === '' ? null : Number(document.getElementById('fwmax').value),
+    locatie: document.getElementById('floc').value.trim(),
+    opmerkingen: document.getElementById('fo').value.trim(),
+    afbeelding: document.getElementById('fafb').value.trim(),
+    fotos: currentPhotos.slice(),
+    datumToegevoegd: existing ? existing.datumToegevoegd : new Date().toISOString(),
+  };
+  try {
+    await persistNew(item);
+    ['fa', 'ft', 'fj', 'fl', 'fg', 'fla', 'fbc', 'floc', 'fo', 'fafb'].forEach(function (id) { document.getElementById(id).value = ''; });
+    document.getElementById('fwmin').value = ''; document.getElementById('fwmax').value = '';
+    currentPhotos = []; editingId = null; aiPendingQuestion = ''; aiConversation = null;
+    renderFotoArea();
+    if (!syncMode) render();
+    toonTab('collectie', document.getElementById('tabCollectie'));
+  } catch (err) { showErr('Opslaan is niet gelukt: ' + (err && err.message ? err.message : String(err))); }
+}
+document.getElementById('addTabBtn').onclick = function () { closeAllMenus(); editingId = null; currentPhotos = []; renderFotoArea(); toonTab('toevoegen', document.getElementById('tabToevoegen')); };
+
+// ---------- Synchronisatie ----------
+function getFirebaseConfig() { var raw = localStorage.getItem(FIREBASE_CONFIG_STORAGE); if (!raw) return null; try { return JSON.parse(raw); } catch (e) { return null; } }
+function parseFirebaseConfig(raw) {
+  var trimmed = raw.trim(); if (!trimmed) return null;
+  trimmed = trimmed.replace(/^\s*\/\/.*$/gm, '');
+  trimmed = trimmed.replace(/[\u201C\u201D\u201E\u201F]/g, '"').replace(/[\u2018\u2019\u201A\u201B]/g, "'");
+  var start = trimmed.indexOf('{'), end = trimmed.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('Geen geldig configuratie-object gevonden');
+  var parsed = new Function('return (' + trimmed.slice(start, end + 1) + ');')();
+  if (!parsed || !parsed.apiKey || !parsed.projectId) throw new Error('Configuratie mist verplichte velden');
+  return parsed;
+}
+function updateSyncBadge() { document.getElementById('syncBadge').textContent = syncMode ? '\u25CF gesynchroniseerd' : ''; }
+function initSync() {
+  var config = getFirebaseConfig();
+  if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+  if (!config) { syncMode = false; updateSyncBadge(); laad(); render(); return; }
+  if (typeof firebase === 'undefined') { syncMode = false; updateSyncBadge(); showGlobalError('De Firebase-bibliotheek kon niet geladen worden.'); laad(); render(); return; }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(config);
+    else { firebase.app().delete().catch(function () { }); firebase.initializeApp(config); }
+    firestoreDb = firebase.firestore();
+    if (!persistenceAttempted) {
+      persistenceAttempted = true;
+      try { firestoreDb.enablePersistence({ synchronizeTabs: true }).catch(function () { }); } catch (e) { }
+    }
+    syncMode = true; updateSyncBadge(); clearGlobalError();
+    unsubscribeSnapshot = firestoreDb.collection('cds').onSnapshot(function (snapshot) {
+      clearGlobalError();
+      col = snapshot.docs.map(function (d) { return d.data(); });
+      ensureIds();
+      render();
+    }, function () { showGlobalError('Synchroniseren lukt niet. Controleer je Firebase-configuratie en de databaseregels.'); });
+  } catch (e) {
+    syncMode = false; updateSyncBadge();
+    showGlobalError('Verbinden met Firebase mislukt: ' + (e && e.message ? e.message : String(e)));
+    laad(); render();
+  }
+}
+
+// ---------- Instellingen ----------
+var settingsOverlay = document.getElementById('settingsOverlay');
+var apiKeyInput = document.getElementById('apiKeyInput');
+var firebaseConfigInput = document.getElementById('firebaseConfigInput');
+var syncStatus = document.getElementById('syncStatus');
+function updateGeminiStatus() {
+  var el = document.getElementById('geminiStatus');
+  if (getApiKey()) { el.className = 'status-ok'; el.textContent = '\u2713 Gemini-key is ingesteld.'; }
+  else { el.className = 'status-warn'; el.textContent = 'Nog geen Gemini-key ingesteld.'; }
+}
+function openSettings() {
+  apiKeyInput.value = getApiKey();
+  var cfg = getFirebaseConfig();
+  firebaseConfigInput.value = cfg ? JSON.stringify(cfg, null, 2) : '';
+  updateGeminiStatus();
+  syncStatus.className = 'status-ok';
+  syncStatus.textContent = syncMode ? 'Synchronisatie is actief op dit apparaat.' : '';
+  settingsOverlay.classList.add('open');
+}
+function closeSettings() { settingsOverlay.classList.remove('open'); }
+document.getElementById('settingsBtn').onclick = openSettings;
+document.getElementById('closeSettings').onclick = closeSettings;
+document.getElementById('cancelSettings').onclick = closeSettings;
+document.getElementById('clearGeminiBtn').onclick = function () {
+  if (!confirm('Gemini API-key verwijderen?')) return;
+  localStorage.removeItem(GEMINI_KEY_STORAGE); apiKeyInput.value = ''; updateGeminiStatus();
+};
+document.getElementById('clearFirebaseBtn').onclick = function () {
+  if (!confirm('Synchronisatie stopzetten op dit apparaat?')) return;
+  localStorage.removeItem(FIREBASE_CONFIG_STORAGE); firebaseConfigInput.value = '';
+  syncStatus.className = 'status-ok'; syncStatus.textContent = 'Synchronisatie uitgeschakeld \u2014 gegevens blijven lokaal op dit apparaat.';
+  initSync();
+};
+document.getElementById('saveSettings').onclick = function () {
+  var key = apiKeyInput.value.trim();
+  if (key) localStorage.setItem(GEMINI_KEY_STORAGE, key);
+  updateGeminiStatus();
+  var raw = firebaseConfigInput.value.trim();
+  if (!raw) {
+    syncStatus.className = 'status-ok';
+    syncStatus.textContent = getFirebaseConfig() ? 'Synchronisatie-instellingen ongewijzigd (veld was leeg).' : 'Synchronisatie is niet ingesteld.';
+    return;
+  }
+  try {
+    var parsed = parseFirebaseConfig(raw);
+    localStorage.setItem(FIREBASE_CONFIG_STORAGE, JSON.stringify(parsed));
+    syncStatus.className = 'status-ok'; syncStatus.textContent = 'Instellingen bewaard, synchronisatie wordt gestart\u2026';
+    initSync();
+  } catch (err) { syncStatus.className = 'status-warn'; syncStatus.textContent = 'Kon de configuratie niet lezen. Plak het hele firebaseConfig-object.'; }
+};
+document.getElementById('importLocalBtn').onclick = async function () {
+  if (!syncMode) { syncStatus.className = 'status-warn'; syncStatus.textContent = 'Stel eerst synchronisatie in en bewaar de instellingen.'; return; }
+  syncStatus.className = 'status-ok'; syncStatus.textContent = 'Lokale cds worden ge\u00efmporteerd\u2026';
+  try {
+    var raw = localStorage.getItem(SKEY);
+    var localCol = raw ? JSON.parse(raw) : [];
+    localCol.forEach(function (p) { if (!p.id) p.id = 'legacy_' + hashStr((p.artiest || '') + '|' + (p.titel || '') + '|' + (p.jaar || '') + '|' + (p.label || '')); });
+    if (!localCol.length) { syncStatus.textContent = 'Geen lokale cds gevonden op dit apparaat.'; return; }
+    var count = 0;
+    for (var i = 0; i < localCol.length; i++) { await firestoreDb.collection('cds').doc(localCol[i].id).set(localCol[i], { merge: true }); count++; }
+    syncStatus.textContent = count + ' lokale cds ge\u00efmporteerd naar de synchronisatie.';
+  } catch (err) { syncStatus.className = 'status-warn'; syncStatus.textContent = 'Importeren is niet gelukt.'; }
+};
+settingsOverlay.addEventListener('click', function (e) { if (e.target === settingsOverlay) closeSettings(); });
+
+// ---------- Dropdownmenu's ----------
+function closeAllMenus() { document.querySelectorAll('.dropdown-menu.open').forEach(function (m) { m.classList.remove('open'); }); }
+function toggleMenu(id) { var m = document.getElementById(id); var was = m.classList.contains('open'); closeAllMenus(); if (!was) m.classList.add('open'); }
+document.getElementById('exportMenuBtn').onclick = function (e) { e.stopPropagation(); toggleMenu('exportMenu'); };
+document.getElementById('addMenuBtn').onclick = function (e) { e.stopPropagation(); toggleMenu('addMenu'); };
+document.addEventListener('click', function (e) { if (!e.target.closest('.dropdown-wrap')) closeAllMenus(); });
+
+// ---------- Batch toevoegen ----------
+var batchOverlay = document.getElementById('batchOverlay');
+var batchDropArea = document.getElementById('batchDropArea');
+var batchFileInput = document.getElementById('batchFileInput');
+var batchList = document.getElementById('batchList');
+var batchToolbar = document.getElementById('batchToolbar');
+var batchErrorBox = document.getElementById('batchErrorBox');
+function showBatchErr(msg) { batchErrorBox.textContent = msg; batchErrorBox.classList.add('show'); }
+function clearBatchErr() { batchErrorBox.textContent = ''; batchErrorBox.classList.remove('show'); }
+function openBatch() { batchItems = []; clearBatchErr(); renderBatchDrop(); renderBatchList(); batchOverlay.classList.add('open'); }
+function closeBatch() { batchOverlay.classList.remove('open'); batchItems = []; }
+function renderBatchDrop() {
+  batchDropArea.innerHTML = '<button class="batch-drop" type="button" id="batchDropBtn">&#128247; Selecteer foto\'s \u2014 elke foto wordt een aparte cd</button>';
+  document.getElementById('batchDropBtn').onclick = function () { batchFileInput.click(); };
+}
+function renderBatchList() {
+  batchToolbar.style.display = batchItems.length ? 'flex' : 'none';
+  if (!batchItems.length) { batchList.innerHTML = ''; return; }
+  batchList.innerHTML = batchItems.map(function (b, idx) {
+    return '<div class="batch-card' + (b.analyzing ? ' analyzing' : '') + '"><img src="' + b.photoData + '" alt="Cd ' + (idx + 1) + '">' +
+      '<div class="batch-card-fields"><div class="batch-card-row">' +
+      '<input type="text" placeholder="Artiest *" value="' + escapeHtml(b.artiest) + '" data-bf="artiest" data-bi="' + idx + '">' +
+      '<input type="text" placeholder="Titel *" value="' + escapeHtml(b.titel) + '" data-bf="titel" data-bi="' + idx + '"></div>' +
+      '<div class="batch-card-row"><input type="text" placeholder="Genre" value="' + escapeHtml(b.genre) + '" data-bf="genre" data-bi="' + idx + '">' +
+      '<input type="number" placeholder="Jaar" value="' + escapeHtml(b.jaar) + '" data-bf="jaar" data-bi="' + idx + '"></div>' +
+      (b.error ? '<p class="batch-card-err">' + escapeHtml(b.error) + '</p>' : '') +
+      '</div><button class="batch-card-remove" type="button" data-br="' + idx + '">&#10005;</button></div>';
+  }).join('');
+  batchList.querySelectorAll('[data-bf]').forEach(function (inp) {
+    inp.oninput = function () { batchItems[Number(inp.dataset.bi)][inp.dataset.bf] = inp.value; };
+  });
+  batchList.querySelectorAll('[data-br]').forEach(function (btn) {
+    btn.onclick = function () { batchItems.splice(Number(btn.dataset.br), 1); renderBatchList(); };
+  });
+}
+batchFileInput.addEventListener('change', async function (e) {
+  var files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  clearBatchErr();
+  var room = MAX_BATCH - batchItems.length;
+  var toProcess = files.slice(0, room);
+  if (files.length > room) showBatchErr('Je kunt maximaal ' + MAX_BATCH + " cds in \u00e9\u00e9n batch verwerken.");
+  try {
+    for (var i = 0; i < toProcess.length; i++) {
+      var dataUrl = await resizeImageWithLimit(toProcess[i], PHOTO_MAX_CHARS);
+      batchItems.push({ photoData: dataUrl, artiest: '', titel: '', genre: '', jaar: '', analyzing: false, error: '' });
+    }
+    renderBatchList();
+  } catch (err) { showBatchErr("Een van de foto's kon niet worden geladen."); }
+  e.target.value = '';
+});
+async function analyzeAllBatch() {
+  var apiKey = getApiKey();
+  if (!apiKey) { showBatchErr('Stel eerst een gratis Gemini API-key in via &#9881; rechtsboven.'); return; }
+  if (aiQuotaExceeded) { showBatchErr('Dagelijkse AI-limiet bereikt \u2014 morgen weer beschikbaar.'); return; }
+  clearBatchErr();
+  var btn = document.getElementById('batchAnalyzeAllBtn');
+  btn.disabled = true;
+  for (var i = 0; i < batchItems.length; i++) {
+    var b = batchItems[i];
+    if (b.artiest && b.titel) continue;
+    b.analyzing = true; b.error = ''; renderBatchList();
+    btn.textContent = '\u2728 Bezig\u2026 (' + (i + 1) + '/' + batchItems.length + ')';
+    try {
+      var result = await analyzeWithGemini(b.photoData, apiKey);
+      var s = result.suggestion;
+      b.artiest = s.artiest || ''; b.titel = s.titel || ''; b.genre = s.genre || ''; b.jaar = s.jaar || '';
+    } catch (err) {
+      b.analyzing = false;
+      if (err && err.quotaExceeded) { aiQuotaExceeded = true; showBatchErr('Dagelijkse AI-limiet bereikt \u2014 vul de rest handmatig aan.'); renderBatchList(); break; }
+      b.error = err && err.message ? err.message : 'AI-herkenning mislukt.';
+    } finally { b.analyzing = false; }
+  }
+  btn.textContent = '\u2728 Analyseer alles met AI'; btn.disabled = false;
+  renderBatchList();
+}
+async function saveBatchAll() {
+  clearBatchErr();
+  var toSave = batchItems.filter(function (b) { return b.artiest.trim() && b.titel.trim(); });
+  var skipped = batchItems.length - toSave.length;
+  if (!toSave.length) { showBatchErr('Geef minimaal \u00e9\u00e9n cd een artiest en titel voordat je opslaat.'); return; }
+  var saveBtn = document.getElementById('saveBatchBtn');
+  saveBtn.disabled = true;
+  var volgnummer = Math.max(0, ...col.map(function (p) { return p.volgnummer || 0; }));
+  try {
+    for (var i = 0; i < toSave.length; i++) {
+      var b = toSave[i];
+      volgnummer++;
+      var item = {
+        id: Date.now() + '_' + volgnummer, volgnummer: volgnummer, inventarisnummer: formatInventoryNumber(volgnummer),
+        artiest: b.artiest.trim(), titel: b.titel.trim(), genre: b.genre.trim(),
+        jaar: b.jaar === '' ? null : Number(b.jaar),
+        label: '', barcode: '', staat_cd: 'Very Good Plus (VG+)', staat_hoesje: 'Very Good Plus (VG+)',
+        formaat: 'LP', land: '', waardeMin: null, waardeMax: null, locatie: '', opmerkingen: '', afbeelding: '',
+        fotos: [b.photoData], datumToegevoegd: new Date().toISOString(),
+      };
+      await persistNew(item);
+    }
+    if (!syncMode) render();
+    closeBatch();
+  } catch (err) { showBatchErr('Opslaan is niet gelukt. Probeer het opnieuw.'); }
+  finally { saveBtn.disabled = false; }
+}
+document.getElementById('batchAddBtn').onclick = function () { closeAllMenus(); openBatch(); };
+document.getElementById('closeBatch').onclick = closeBatch;
+document.getElementById('cancelBatchBtn').onclick = closeBatch;
+document.getElementById('batchAddMoreBtn').onclick = function () { batchFileInput.click(); };
+document.getElementById('batchAnalyzeAllBtn').onclick = analyzeAllBatch;
+document.getElementById('saveBatchBtn').onclick = saveBatchAll;
+batchOverlay.addEventListener('click', function (e) { if (e.target === batchOverlay) closeBatch(); });
+
+// ---------- Export: PDF & Excel ----------
+function triggerDownload(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function tryLoadCanvas(src) {
+  return new Promise(function (resolve) {
+    var img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = function () {
+      try {
+        var canvas = document.createElement('canvas'); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      } catch (e) { resolve(null); }
+    };
+    img.onerror = function () { resolve(null); };
+    img.src = src;
+  });
+}
+function corsProxyUrl(src) { return 'https://wsrv.nl/?url=' + encodeURIComponent(src.replace(/^https?:\/\//, '')) + '&output=jpg&q=85'; }
+async function loadImageAsDataUrl(src) {
+  if (!src) return null;
+  if (src.indexOf('data:') === 0) return src;
+  var direct = await tryLoadCanvas(src);
+  if (direct) return direct;
+  return await tryLoadCanvas(corsProxyUrl(src));
+}
+function getImageDims(dataUrl) {
+  return new Promise(function (resolve) {
+    var img = new Image();
+    img.onload = function () { resolve({ w: img.naturalWidth || 1, h: img.naturalHeight || 1 }); };
+    img.onerror = function () { resolve({ w: 1, h: 1 }); };
+    img.src = dataUrl;
+  });
+}
+
+async function handleExportXls() {
+  var btn = document.getElementById('exportXlsBtn'); btn.disabled = true;
+  try {
+    var workbook = new ExcelJS.Workbook();
+    var sheet = workbook.addWorksheet('Cd-collectie');
+    sheet.columns = [
+      { header: 'Inventarisnummer', key: 'inventarisnummer', width: 14 },
+      { header: 'Foto', key: 'foto', width: 13 },
+      { header: 'Artiest', key: 'artiest', width: 22 }, { header: 'Titel', key: 'titel', width: 28 },
+      { header: 'Jaar', key: 'jaar', width: 8 }, { header: 'Label / Nr.', key: 'label', width: 22 },
+      { header: 'Barcode', key: 'barcode', width: 16 }, { header: 'Formaat', key: 'formaat', width: 12 },
+      { header: 'Genre', key: 'genre', width: 14 }, { header: 'Land', key: 'land', width: 8 },
+      { header: 'Staat Cd', key: 'staat_cd', width: 18 }, { header: 'Staat Hoesje', key: 'staat_hoesje', width: 18 },
+      { header: 'Waarde min (\u20ac)', key: 'waardeMin', width: 14 }, { header: 'Waarde max (\u20ac)', key: 'waardeMax', width: 14 },
+      { header: 'Locatie', key: 'locatie', width: 16 }, { header: 'Opmerkingen', key: 'opmerkingen', width: 30 },
+    ];
+    sheet.getRow(1).font = { bold: true };
+    var mislukt = 0;
+    for (var idx = 0; idx < col.length; idx++) {
+      var p = col[idx], rowNumber = idx + 2;
+      sheet.addRow({
+        inventarisnummer: p.inventarisnummer || '', foto: '', artiest: p.artiest, titel: p.titel, jaar: p.jaar || '',
+        label: p.label || '', barcode: p.barcode || '', formaat: p.formaat || '', genre: p.genre || '', land: p.land || '',
+        staat_cd: p.staat_cd || '', staat_hoesje: p.staat_hoesje || '',
+        waardeMin: p.waardeMin ?? '', waardeMax: p.waardeMax ?? '', locatie: p.locatie || '', opmerkingen: p.opmerkingen || '',
+      });
+      sheet.getRow(rowNumber).height = 58;
+      var photos = getPhotos(p);
+      if (photos.length) {
+        var dataUrl = await loadImageAsDataUrl(photos[0]);
+        if (dataUrl) {
+          try {
+            var imageId = workbook.addImage({ base64: dataUrl, extension: 'jpeg' });
+            sheet.addImage(imageId, { tl: { col: 1, row: rowNumber - 1 }, ext: { width: 66, height: 66 } });
+          } catch (e) { mislukt++; }
+        } else mislukt++;
+      }
+    }
+    var buffer = await workbook.xlsx.writeBuffer();
+    var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    triggerDownload(blob, 'cdcollectie-' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    if (mislukt > 0) showGlobalError(mislukt + ' van de ' + col.length + " hoesfoto's konden niet worden toegevoegd. De rest van de export is wel gelukt.");
+  } catch (err) { showGlobalError('Exporteren naar Excel is niet gelukt: ' + (err && err.message ? err.message : String(err))); }
+  finally { btn.disabled = false; }
+}
+
+async function handleExportPdf() {
+  if (!col.length) return;
+  var btn = document.getElementById('exportPdfBtn'); btn.disabled = true;
+  try {
+    var jsPDFCtor = window.jspdf.jsPDF;
+    var doc = new jsPDFCtor({ unit: 'mm', format: 'a4' });
+    var marginX = 18, pageW = doc.internal.pageSize.getWidth(), pageH = doc.internal.pageSize.getHeight(), contentW = pageW - marginX * 2;
+    for (var idx = 0; idx < col.length; idx++) {
+      var p = col[idx];
+      if (idx > 0) doc.addPage();
+      var y = 20;
+      doc.setFont('courier', 'normal'); doc.setFontSize(9); doc.setTextColor(156, 59, 46);
+      doc.text(p.inventarisnummer || '', pageW - marginX, y, { align: 'right' });
+      doc.setFont('times', 'bold'); doc.setFontSize(19); doc.setTextColor(27, 42, 30);
+      var titleLines = doc.splitTextToSize(p.titel || 'Zonder titel', contentW - 25);
+      doc.text(titleLines, marginX, y); y += titleLines.length * 8;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(184, 135, 59);
+      doc.text(p.artiest || '', marginX, y + 4); y += 12;
+      doc.setDrawColor(184, 135, 59); doc.setLineWidth(0.4); doc.line(marginX, y, pageW - marginX, y); y += 8;
+      var photos = getPhotos(p);
+      if (photos.length) {
+        var dataUrl = await loadImageAsDataUrl(photos[0]);
+        if (dataUrl) {
+          var dims = await getImageDims(dataUrl);
+          var maxW = 75, maxH = 75, w = maxW, h = (dims.h / dims.w) * w;
+          if (h > maxH) { h = maxH; w = (dims.w / dims.h) * h; }
+          try { doc.addImage(dataUrl, 'JPEG', marginX, y, w, h); } catch (e) { }
+          y += h + 10;
+        } else { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(140, 140, 140); doc.text('(hoesfoto niet beschikbaar)', marginX, y); y += 8; }
+      }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(30, 30, 30);
+      var waardeText = (p.waardeMin || p.waardeMax) ? ('\u20ac ' + (p.waardeMin ?? '?') + (p.waardeMax ? ' \u2013 \u20ac ' + p.waardeMax : '')) : '';
+      var fields = [['Label / Nr.', p.label], ['Formaat', p.formaat], ['Jaar', p.jaar], ['Genre', p.genre], ['Land', p.land], ['Staat cd', p.staat_cd], ['Staat hoesje', p.staat_hoesje], ['Geschatte waarde', waardeText], ['Locatie', p.locatie], ['Barcode', p.barcode]].filter(function (f) { return f[1]; });
+      fields.forEach(function (f) {
+        if (y > pageH - 25) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.text(f[0] + ':', marginX, y);
+        doc.setFont('helvetica', 'normal');
+        var lines = doc.splitTextToSize(String(f[1]), contentW - 50);
+        doc.text(lines, marginX + 45, y); y += Math.max(6, lines.length * 5);
+      });
+      if (p.opmerkingen) {
+        y += 3; if (y > pageH - 25) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'italic'); doc.setTextColor(100, 100, 100);
+        var noteLines = doc.splitTextToSize(p.opmerkingen, contentW);
+        if (y + noteLines.length * 5 > pageH - 15) { doc.addPage(); y = 20; }
+        doc.text(noteLines, marginX, y);
+      }
+    }
+    doc.save('cdcollectie-' + new Date().toISOString().slice(0, 10) + '.pdf');
+  } catch (err) { showGlobalError('PDF maken is niet gelukt: ' + (err && err.message ? err.message : String(err))); }
+  finally { btn.disabled = false; }
+}
+document.getElementById('exportPdfBtn').onclick = function () { closeAllMenus(); handleExportPdf(); };
+document.getElementById('exportXlsBtn').onclick = function () { closeAllMenus(); handleExportXls(); };
+
+renderFotoArea();
+initSync();
+</script>
+</body>
+</html>
