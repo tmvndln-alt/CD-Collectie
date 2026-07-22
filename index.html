@@ -654,14 +654,36 @@ async function analyzeWithGemini(dataUrl, apiKey) {
   var suggestion = parseAiJson(text);
   return { suggestion: suggestion, conversation: contents.concat([{ role: 'model', parts: [{ text: text }] }]) };
 }
-async function askGeminiFollowUp(apiKey, conversation, userAnswer) {
-  var newContents = conversation.concat([{ role: 'user', parts: [{ text: userAnswer + '\n\nGeef op basis hiervan opnieuw ALLEEN het JSON-object in exact hetzelfde format als eerder. Vul "vraag" alleen opnieuw in als er nog een noodzakelijke onduidelijkheid overblijft, anders laat je dat veld leeg.' }] }]);
+async function askGeminiFollowUp(apiKey, conversation, userAnswer, photoDataUrl) {
+  var parts = [];
+  var baseText = (userAnswer && userAnswer.trim()) ? userAnswer.trim() : '(zie de bijgevoegde foto)';
+  parts.push({ text: baseText + '\n\nGeef op basis hiervan opnieuw ALLEEN het JSON-object in exact hetzelfde format als eerder. Vul "vraag" alleen opnieuw in als er nog een noodzakelijke onduidelijkheid overblijft, anders laat je dat veld leeg.' });
+  if (photoDataUrl) {
+    var match = photoDataUrl.match(/^data:(.+);base64,(.*)$/);
+    if (match) parts.push({ inline_data: { mime_type: match[1], data: match[2] } });
+  }
+  var newContents = conversation.concat([{ role: 'user', parts: parts }]);
   var text = await callGeminiConversation(apiKey, newContents);
   var suggestion = parseAiJson(text);
   return { suggestion: suggestion, conversation: newContents.concat([{ role: 'model', parts: [{ text: text }] }]) };
 }
 
 function getApiKey() { return localStorage.getItem(GEMINI_KEY_STORAGE) || ''; }
+
+var aiAnswerPhoto = null;
+function renderAiAnswerPhotoArea() {
+  var el = document.getElementById('aiAnswerPhotoArea');
+  if (!el) return;
+  if (aiAnswerPhoto) {
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+      '<img src="' + aiAnswerPhoto + '" style="width:44px;height:44px;object-fit:cover;border-radius:3px;border:1px solid var(--line);">' +
+      '<button type="button" id="aiAnswerPhotoRemove" class="link-btn">Foto verwijderen</button></div>';
+    document.getElementById('aiAnswerPhotoRemove').onclick = function () { aiAnswerPhoto = null; renderAiAnswerPhotoArea(); };
+  } else {
+    el.innerHTML = '<button type="button" id="aiAnswerPhotoAddBtn" class="link-btn" style="margin-bottom:6px;">+ Foto toevoegen bij antwoord</button>';
+    document.getElementById('aiAnswerPhotoAddBtn').onclick = function () { document.getElementById('aiAnswerPhotoInput').click(); };
+  }
+}
 
 function renderAiArea() {
   if (!currentPhotos.length) { aiArea.innerHTML = ''; return; }
@@ -671,12 +693,25 @@ function renderAiArea() {
   if (aiPendingQuestion) {
     aiArea.innerHTML =
       '<div class="error-box show" style="background:rgba(184,135,59,0.12);color:var(--brass-dark);"><strong>AI vraagt:</strong> ' + escapeHtml(aiPendingQuestion) + '</div>' +
-      '<div style="display:flex;gap:6px;margin:8px 0;"><input type="text" id="aiAnswerInput" placeholder="Typ hier je antwoord..." style="flex:1;border-radius:3px;padding:8px 10px;border:1px solid var(--line);background:var(--cream);font-size:13px;">' +
+      '<div id="aiAnswerPhotoArea"></div>' +
+      '<input type="file" id="aiAnswerPhotoInput" accept="image/*" style="display:none">' +
+      '<div style="display:flex;gap:6px;margin:8px 0;"><input type="text" id="aiAnswerInput" placeholder="Typ hier je antwoord (mag ook leeg als je een foto toevoegt)..." style="flex:1;border-radius:3px;padding:8px 10px;border:1px solid var(--line);background:var(--cream);font-size:13px;">' +
       '<button class="ai-btn" id="aiAnswerBtn" type="button" style="width:auto;">Versturen</button></div>' +
       '<button type="button" id="aiSkipQuestionBtn" class="link-btn">Vraag overslaan</button>';
+    renderAiAnswerPhotoArea();
+    document.getElementById('aiAnswerPhotoInput').addEventListener('change', async function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      clearErr();
+      try {
+        aiAnswerPhoto = await resizeImageWithLimit(file, PHOTO_MAX_CHARS);
+        renderAiAnswerPhotoArea();
+      } catch (err) { showErr('De foto kon niet worden geladen.'); }
+      e.target.value = '';
+    });
     document.getElementById('aiAnswerBtn').onclick = handleAnswerFollowUp;
     document.getElementById('aiAnswerInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); handleAnswerFollowUp(); } });
-    document.getElementById('aiSkipQuestionBtn').onclick = function () { aiPendingQuestion = ''; aiConversation = null; renderAiArea(); };
+    document.getElementById('aiSkipQuestionBtn').onclick = function () { aiPendingQuestion = ''; aiConversation = null; aiAnswerPhoto = null; renderAiArea(); };
     return;
   }
   aiArea.innerHTML = '<button class="ai-btn" id="analyzeBtn" type="button">&#10024; Laat AI dit herkennen</button>' + (hasKey ? (currentPhotos.length > 1 ? '<p class="ai-hint">De AI bekijkt alleen de omslagfoto.</p>' : '') : '<p class="ai-hint">Nog geen API-key ingesteld \u2014 klik op &#9881; rechtsboven.</p>');
@@ -716,16 +751,18 @@ async function handleAnswerFollowUp() {
   var apiKey = getApiKey();
   var input = document.getElementById('aiAnswerInput');
   var answer = input ? input.value.trim() : '';
-  if (!answer || !aiConversation) return;
+  if (!answer && !aiAnswerPhoto) return;
+  if (!aiConversation) return;
   clearErr(); analyzing = true; renderAiArea();
   try {
-    var result = await askGeminiFollowUp(apiKey, aiConversation, answer);
+    var result = await askGeminiFollowUp(apiKey, aiConversation, answer, aiAnswerPhoto);
     applyAiSuggestion(result.suggestion);
     aiFollowUpRounds++;
+    aiAnswerPhoto = null;
     if (result.suggestion.vraag && aiFollowUpRounds < MAX_AI_FOLLOWUPS) { aiPendingQuestion = result.suggestion.vraag; aiConversation = result.conversation; }
     else { aiPendingQuestion = ''; aiConversation = null; }
   } catch (err) {
-    aiPendingQuestion = ''; aiConversation = null;
+    aiPendingQuestion = ''; aiConversation = null; aiAnswerPhoto = null;
     if (err && err.quotaExceeded) aiQuotaExceeded = true;
     else showErr(err && err.message ? err.message : 'Versturen is niet gelukt.');
   } finally { analyzing = false; renderAiArea(); }
@@ -768,7 +805,7 @@ async function cdOpslaan() {
     await persistNew(item);
     ['fa', 'ft', 'fj', 'fl', 'fg', 'fla', 'fbc', 'floc', 'fo', 'fafb'].forEach(function (id) { document.getElementById(id).value = ''; });
     document.getElementById('fwmin').value = ''; document.getElementById('fwmax').value = '';
-    currentPhotos = []; editingId = null; aiPendingQuestion = ''; aiConversation = null;
+    currentPhotos = []; editingId = null; aiPendingQuestion = ''; aiConversation = null; aiAnswerPhoto = null;
     renderFotoArea();
     if (!syncMode) render();
     toonTab('collectie', document.getElementById('tabCollectie'));
